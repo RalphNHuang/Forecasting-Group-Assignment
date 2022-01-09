@@ -1,0 +1,157 @@
+---
+title: "Forecasting & Predictive Group Assignment"
+author: "Kai KANG, Jiaqian MA, Yinzhe HUANG, Yue CHEN"
+date: "2022/1/7"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Assessing the data and univariate benchmarks
+
+###1.1 Are these six variables stationary?
+
+
+```{r include=FALSE}
+library(tidyverse)
+rawData = read_csv("./dat/Projectdata.csv")
+
+```
+
+#### ACF & PACF Visualizations
+
+##### ACF & PACF of Hoobies category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Hobbies_CA_1)
+pacf(rawData$Hobbies_CA_1)
+
+acf(rawData$Hobbies_CA_2)
+pacf(rawData$Hobbies_CA_2)
+
+acf(rawData$Hobbies_CA_3)
+pacf(rawData$Hobbies_CA_3)
+```
+
+##### ACF & PACF of Household_1 category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Household_1_CA_1)
+pacf(rawData$Household_1_CA_1)
+
+acf(rawData$Household_1_CA_2)
+pacf(rawData$Household_1_CA_2)
+
+acf(rawData$Household_1_CA_3)
+pacf(rawData$Household_1_CA_3)
+```
+
+##### ACF & PACF of Household_2 category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Household_2_CA_1)
+pacf(rawData$Household_2_CA_1)
+
+acf(rawData$Household_2_CA_2)
+pacf(rawData$Household_2_CA_2)
+
+acf(rawData$Household_2_CA_3)
+pacf(rawData$Household_2_CA_3)
+```
+
+##### ACF & PACF of Foods_1 category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Foods_1_CA_1)
+pacf(rawData$Foods_1_CA_1)
+
+acf(rawData$Foods_1_CA_2)
+pacf(rawData$Foods_1_CA_2)
+
+acf(rawData$Foods_1_CA_3)
+pacf(rawData$Foods_1_CA_3)
+```
+
+##### ACF & PACF of Food_2 category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Foods_2_CA_1)
+pacf(rawData$Foods_2_CA_1)
+
+acf(rawData$Foods_2_CA_2)
+pacf(rawData$Foods_2_CA_2)
+
+acf(rawData$Foods_2_CA_3)
+pacf(rawData$Foods_2_CA_3)
+```
+
+##### ACF & PACF of Foods_3 category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Foods_3_CA_1)
+pacf(rawData$Foods_3_CA_1)
+
+acf(rawData$Foods_3_CA_2)
+pacf(rawData$Foods_3_CA_2)
+
+acf(rawData$Foods_3_CA_3)
+pacf(rawData$Foods_3_CA_3)
+```
+
+#### Stationary Test
+
+##### ADF Test for Hobbies category
+```{r}
+library(tseries)
+
+adf.test(rawData$Hobbies_CA_1)
+adf.test(rawData$Hobbies_CA_2)
+adf.test(rawData$Hobbies_CA_3)
+```
+
+##### ADF Test for Houshold_1 category
+```{r}
+library(tseries)
+
+adf.test(rawData$Household_1_CA_1)
+adf.test(rawData$Household_1_CA_2)
+adf.test(rawData$Household_1_CA_3)
+```
+
+##### ADF Test for HOushold_2 category
+```{r}
+library(tseries)
+
+adf.test(rawData$Household_2_CA_1)
+adf.test(rawData$Household_2_CA_2)
+adf.test(rawData$Household_2_CA_3)
+```
+
+##### ADF Test for Foods_1 category
+```{r}
+library(tseries)
+
+adf.test(rawData$Foods_1_CA_1)
+adf.test(rawData$Foods_1_CA_2)
+adf.test(rawData$Foods_1_CA_3)
+```
+
+##### ADF Test for Foods_2 category
+```{r}
+library(tseries)
+
+adf.test(rawData$Foods_2_CA_1)
+adf.test(rawData$Foods_2_CA_2)
+adf.test(rawData$Foods_2_CA_3)
+```
+
+##### ADF Test for Foods_3 category
+```{r}
+library(tseries)
+
+adf.test(rawData$Foods_3_CA_1)
+adf.test(rawData$Foods_3_CA_1)
+adf.test(rawData$Foods_3_CA_1)
+```
