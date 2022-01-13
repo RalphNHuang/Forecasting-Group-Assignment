@@ -155,3 +155,8 @@ adf.test(rawData$Foods_3_CA_1)
 adf.test(rawData$Foods_3_CA_1)
 adf.test(rawData$Foods_3_CA_1)
 ```
+
+```{r}
+
+```
+
