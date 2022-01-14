@@ -19,6 +19,11 @@ testAggCat = agg_by_cat(testData)
 trainAggWeek = agg_by_week(trainData)
 testAggWeek = agg_by_week(testData)
 
+
+# by store
+trainAggStore = agg_by_store(trainData)
+testAggStore = agg_by_store(testData)
+
 ### experiment with one column
 
 #hobby_ts_1 = msts(trainData$Hobbies_CA_1, start = 1, seasonal.periods = c(7, 30.4, 365.25))

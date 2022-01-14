@@ -41,3 +41,19 @@ agg_by_week = function(data){
     arrange(week)
   return(data)
 }
+
+agg_by_store = function(data){
+  data = data %>% 
+    pivot_longer(cols = colnames(data)[2:ncol(data)],
+                 names_to = "category", values_to = "sales")
+  data$category = str_sub(data$category, -4, -1)
+  data = data %>% 
+    #left_join(mapping) %>% 
+    select(date, category, sales) %>% 
+    group_by(date, category) %>% 
+    summarise(sales = sum(sales)) %>% 
+    ungroup() %>% 
+    pivot_wider(names_from = category, values_from = sales) %>% 
+    arrange(date)# %>% 
+    #select(date, Hobbies, Foods, Household)
+}
