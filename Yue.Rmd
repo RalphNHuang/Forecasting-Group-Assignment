@@ -110,6 +110,63 @@ print(week_tbats_RMSSE_v)
 
 
 
+##### HoltWinters
+```{r warning=False} 
+ts_list = lapply(trainData[,2:ncol(rawData)], ts)
+hw_list = lapply(ts_list, ets)
+devisors = unlist(lapply(trainData[,2:ncol(trainData)], cal.devisor))
+
+hw_crossH_RMSSE = data.frame()
+for (h in 1:28) {
+  pred_list = lapply(hw_list, forecast.beta, h = h)
+  hw_RMSSE_v = eval.RMSSE(testData, pred_list, h = h, devisor = devisors)
+  hw_crossH_RMSSE = rbind(hw_crossH_RMSSE, hw_RMSSE_v)
+}
+
+names(hw_crossH_RMSSE) = names(hw_RMSSE_v)
+print(hw_crossH_RMSSE)
+```
+# 1.4 aggregate by item
+```{r warning=False} 
+cat_ts_list = lapply(trainAggCat[,2:ncol(trainAggCat)], msts.beta)
+cat_hw_list = lapply(cat_ts_list, ets)
+cat_pred_list = lapply(cat_ts_list, forecast.beta)
+cat_devisors = unlist(lapply(trainAggCat[,2:ncol(trainAggCat)], cal.devisor))
+cat_hw_RMSSE_v = eval.RMSSE(testAggCat, cat_pred_list, devisor = cat_devisors)
+print(cat_hw_RMSSE_v)
+```
+# 1.4 aggregate by store
+```{r warning=False} 
+store_ts_list = lapply(trainAggStore[,2:ncol(trainAggStore)], msts.beta)
+store_hw_list = lapply(store_ts_list, ets)
+store_pred_list = lapply(store_ts_list, forecast.beta)
+store_devisors = unlist(lapply(trainAggStore[,2:ncol(trainAggStore)], cal.devisor))
+store_hw_RMSSE_v = eval.RMSSE(testAggStore, store_pred_list, devisor = store_devisors)
+print(store_hw_RMSSE_v)
+```
+# 1.5 aggregate by week
+```{r warning=False} 
+week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], msts.beta)
+week_hw_list = lapply(week_ts_list, ets)
+week_pred_list = lapply(week_ts_list, forecast.beta, h = 4)
+week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
+week_hw_RMSSE_v = eval.RMSSE(testAggWeek, week_pred_list, h = 4, devisor = week_devisors)
+print(week_hw_RMSSE_v)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
