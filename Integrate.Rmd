@@ -1,0 +1,11 @@
+---
+title: "Integrate"
+author: "Kai KANG, Jiaqian MA, Yinzhe HUANG, Yue CHEN"
+date: "2022/1/07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
