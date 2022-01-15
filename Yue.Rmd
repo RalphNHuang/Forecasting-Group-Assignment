@@ -1,0 +1,99 @@
+---
+title: "Forecasting & Predictive Group Assignment"
+author: "Kai KANG, Jiaqian MA, Yinzhe HUANG, Yue CHEN"
+date: "2022/1/12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Assessing the data and univariate benchmarks
+
+###1.1 Are these six variables stationary?
+
+```{r include=FALSE}
+# install.packages('tidyverse')
+library(tidyverse)
+rawData = read_csv("./dat/Projectdata.csv")
+# spec(rawData)
+```
+
+#### ACF & PACF Visualizations
+##### ACF & PACF of Hoobies category
+##### ACF & PACF of Household_1 category
+##### ACF & PACF of Household_2 category
+##### ACF & PACF of Foods_1 category
+##### ACF & PACF of Food_2 category
+##### ACF & PACF of Foods_3 category
+
+#### Stationary Test
+##### ADF Test for Hobbies category
+##### ADF Test for Houshold_1 category
+##### ADF Test for HOushold_2 category
+##### ADF Test for Foods_1 category
+##### ADF Test for Foods_2 category
+##### ADF Test for Foods_3 category
+
+
+
+
+### 1.2 Assess the set of benchmark in the M5 guidelines
+
+#### ES, ESX, Holt-Winters
+
+##### Source function
+```{r}
+source("./R/utils.R")
+```
+
+##### Dataset splition
+```{r}
+trainData = rawData[c(1:(nrow(rawData)-28)),]
+testData = rawData[c((nrow(rawData)-27):nrow(rawData)),]
+```
+
+##### ses
+```{r}
+rawData_colum_list = as.list(rawData[2:19])
+rawData_colum_ts_list = lapply(rawData_colum_list, ts)
+
+RMSSE_list_when_h = list()
+for (h in 1:28){
+ses_list = lapply(rawData_colum_ts_list, ses,h=h)
+devisors = lapply(rawData_colum_list, cal.devisor)
+RMSSE_list = eval.RMSSE(testData, ses_list, h=h, devisors = unlist(devisors))
+# print(RMSSE_list)
+RMSSE_list_when_h[h] = RMSSE_list
+}
+
+RMSSE_df_when_h = data.frame(matrix(unlist(RMSSE_list_when_h), byrow = F, ncol = 1), stringsAsFactors = F)
+colnames(RMSSE_df_when_h) = c('ses_RMSSE')
+
+print(RMSSE_df_when_h)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
