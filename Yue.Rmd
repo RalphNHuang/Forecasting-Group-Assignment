@@ -21,25 +21,6 @@ rawData = read_csv("./dat/Projectdata.csv")
 # spec(rawData)
 ```
 
-#### ACF & PACF Visualizations
-##### ACF & PACF of Hoobies category
-##### ACF & PACF of Household_1 category
-##### ACF & PACF of Household_2 category
-##### ACF & PACF of Foods_1 category
-##### ACF & PACF of Food_2 category
-##### ACF & PACF of Foods_3 category
-
-#### Stationary Test
-##### ADF Test for Hobbies category
-##### ADF Test for Houshold_1 category
-##### ADF Test for HOushold_2 category
-##### ADF Test for Foods_1 category
-##### ADF Test for Foods_2 category
-##### ADF Test for Foods_3 category
-
-
-
-
 ### 1.2 Assess the set of benchmark in the M5 guidelines
 
 #### ES, ESX, Holt-Winters
@@ -47,6 +28,7 @@ rawData = read_csv("./dat/Projectdata.csv")
 ##### Source function
 ```{r}
 source("./R/utils.R")
+source("./R/dataUtils.R")
 ```
 
 ##### Dataset splition
@@ -55,24 +37,19 @@ trainData = rawData[c(1:(nrow(rawData)-28)),]
 testData = rawData[c((nrow(rawData)-27):nrow(rawData)),]
 ```
 
-##### ses
+### Aggregation
 ```{r}
-rawData_colum_list = as.list(rawData[2:19])
-rawData_colum_ts_list = lapply(rawData_colum_list, ts)
+# by categories
+trainAggCat = agg_by_cat(trainData)
+testAggCat = agg_by_cat(testData)
 
-RMSSE_list_when_h = list()
-for (h in 1:28){
-ses_list = lapply(rawData_colum_ts_list, ses,h=h)
-devisors = lapply(rawData_colum_list, cal.devisor)
-RMSSE_list = eval.RMSSE(testData, ses_list, h=h, devisors = unlist(devisors))
-# print(RMSSE_list)
-RMSSE_list_when_h[h] = RMSSE_list
-}
+# by store
+trainAggStore = agg_by_store(trainData)
+testAggStore = agg_by_store(testData)
 
-RMSSE_df_when_h = data.frame(matrix(unlist(RMSSE_list_when_h), byrow = F, ncol = 1), stringsAsFactors = F)
-colnames(RMSSE_df_when_h) = c('ses_RMSSE')
-
-print(RMSSE_df_when_h)
+# by week
+trainAggWeek = agg_by_week(trainData)
+testAggWeek = agg_by_week(testData)
 ```
 
 
@@ -82,10 +59,49 @@ print(RMSSE_df_when_h)
 
 
 
+##### ses
+```{r warning=False} 
+ts_list = lapply(trainData[,2:ncol(rawData)], ts)
+
+devisors = unlist(lapply(trainData[,2:ncol(trainData)], cal.devisor))
+
+ses_crossH_RMSSE = data.frame()
+for (h in 1:28) {
+  pred_list = lapply(ts_list, ses, h=h)
+  ses_RMSSE_v = eval.RMSSE(testData, pred_list, h = h, devisor = devisors)
+  ses_crossH_RMSSE = rbind(ses_crossH_RMSSE, ses_RMSSE_v)
+}
+
+names(ses_crossH_RMSSE) = names(ses_RMSSE_v)
+print(ses_crossH_RMSSE)
+```
 
 
+# 1.4 aggregate by item
+```{r warning=False}
+cat_ts_list = lapply(trainAggCat[,2:ncol(trainAggCat)], ts)
+cat_ses_list = lapply(cat_ts_list, ses, h=4)
+cat_devisors = unlist(lapply(trainAggCat[,2:ncol(trainAggCat)], cal.devisor))
+cat_ses_RMSSE_v = eval.RMSSE(testAggCat, cat_ses_list, h=4, devisor = cat_devisors)
+print(cat_ses_RMSSE_v)
+```
+# 1.4 aggregate by store
+```{r warning=False}
+store_ts_list = lapply(trainAggStore[,2:ncol(trainAggStore)], ts)
+store_ses_list = lapply(store_ts_list, ses, h=4)
+store_devisors = unlist(lapply(trainAggStore[,2:ncol(trainAggStore)], cal.devisor))
+store_ses_RMSSE_v = eval.RMSSE(testAggStore, store_ses_list, h=4, devisor = store_devisors)
+print(store_ses_RMSSE_v)
+```
 
-
+# 1.5 aggregate by week
+```{r warning=False}
+week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], ts)
+week_ses_list = lapply(week_ts_list, ses, h=4)
+week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
+week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_ses_list, h = 4, devisor = week_devisors)
+print(week_tbats_RMSSE_v)
+```
 
 
 
