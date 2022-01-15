@@ -1,33 +1,35 @@
 #重要！导入所有函数，需要tidyverse包
 source("./R/utils.R")
 source("./R/dataUtils.R")
+load("./RData/dataset.RData")
 
 
-### Dataset splition
-rawData = read_csv("./dat/Projectdata.csv")
-rawData[,2:ncol(rawData)] = apply(rawData[,2:ncol(rawData)], 2, scale)
-trainData = rawData[c(1:(nrow(rawData)-28)),]
-testData = rawData[c((nrow(rawData)-27):nrow(rawData)),]
+# ### Dataset splition
+# rawData = read_csv("./dat/Projectdata.csv")
+# rawData[,2:ncol(rawData)] = apply(rawData[,2:ncol(rawData)], 2, scale)
+# trainData = rawData[c(1:(nrow(rawData)-28)),]
+# testData = rawData[c((nrow(rawData)-27):nrow(rawData)),]
+# 
+# ### Aggregation
+# 
+# # by categories
+# trainAggCat = agg_by_cat(trainData)
+# testAggCat = agg_by_cat(testData)
+# 
+# 
+# # by week
+# trainAggWeek = agg_by_week(trainData)
+# testAggWeek = agg_by_week(testData)
+# 
+# 
+# # by store
+# trainAggStore = agg_by_store(trainData)
+# testAggStore = agg_by_store(testData)
+# 
+# save(rawData, testAggCat, testAggStore, testAggWeek, testData,
+#      trainAggCat, trainAggStore, trainAggWeek, trainData,
+#      file = "./RData/dataset.RData")
 
-### Aggregation
-
-# by categories
-trainAggCat = agg_by_cat(trainData)
-testAggCat = agg_by_cat(testData)
-
-
-# by week
-trainAggWeek = agg_by_week(trainData)
-testAggWeek = agg_by_week(testData)
-
-
-# by store
-trainAggStore = agg_by_store(trainData)
-testAggStore = agg_by_store(testData)
-
-save(rawData, testAggCat, testAggStore, testAggWeek, testData,
-     trainAggCat, trainAggStore, trainAggWeek, trainData,
-     file = "./RData/dataset.RData")
 
 ### experiment with one column
 
