@@ -11,6 +11,7 @@ VARselect(trainData[,2:ncol(trainData)], lag.max = 50, type = "none")$selection
 # which is both short and able to cover weekly seasonality
 # ----------------------------------------------------------------------------
 
+
 # Modeling
 
 var_store = VAR(trainAggStore[,2:ncol(trainAggStore)],
@@ -24,3 +25,12 @@ summary(var_cat)
 var_all = VAR(trainData[,2:ncol(trainData)],
               type = "none", p = 7)
 summary(var_all)
+
+# Stationary Test
+
+plot(stability(var_store, type = "OLS-CUSUM"))
+plot(stability(var_cat, type = "OLS-CUSUM"))
+plot(stability(var_all, type = "OLS-CUSUM"))
+
+# Model Adjustion
+var_store2 = VAR(train)
