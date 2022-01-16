@@ -138,24 +138,6 @@ print(hybrid_crossH_RMSSE)
 ```
 
 
-
-
-hybrid_model%>%forecast(testData, h = 10)%>%plot()
-  
-  
-
-arima_pred_list
-RMSSE
-hw_crossH_RMSSE = data.frame()
-
-for (h in 1:28) {
-  hw_pred_list = lapply(hw_list, forecast.beta, h = h)
-  hw_RMSSE_v = eval.RMSSE(testData, hw_pred_list, h = h, devisor = devisors)
-  hw_crossH_RMSSE = rbind(hw_crossH_RMSSE, hw_RMSSE_v)
-}
-```
-
-
 #### (f) Compare the in-sample (training) vs. out-of-sample (testing) fit of the models.
 ```{r warning = F}
 ses_RMSE_train_v = eval.RMSE(trainData, ses_pred_list, mode = "train")

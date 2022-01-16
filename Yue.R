@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ##### Source function
 ```{r}
 #重要！导入所有函数，需要tidyverse包
+library(tidyverse)
 source("./R/utils.R")
 source("./R/dataUtils.R")
 load("./RData/dataset.RData")
@@ -118,6 +119,42 @@ print(lapply(ts_list, ses, h=1))
 #### (d) Assess the quality of the forecasts using relevant loss functions.
 
 #### (e) Compare the above with combinations of the forecasting techniques (using simple averages across methods, such as Combination benchmark #21 in the M5 guidelines).
+```{r warning=False} 
+# install.packages('forecastHybrid')
+library(forecastHybrid)
+ts_list = lapply(trainData[,2:ncol(rawData)], ts)
+hybrid_list = lapply(ts_list, hybridModel,models='ae',weights='equal')
+devisors = unlist(lapply(trainData[,2:ncol(trainData)], cal.devisor))
+
+hybrid_crossH_RMSSE = data.frame()
+for (h in 1:20) {
+  hybrid_pred_list = lapply(hybrid_list, forecast.beta, h = h)
+  hybrid_RMSSE_v = eval.RMSSE(testData, hybrid_pred_list, h = h, devisor = devisors)
+  hybrid_crossH_RMSSE = rbind(hybrid_crossH_RMSSE, hybrid_RMSSE_v)
+}
+
+names(hybrid_crossH_RMSSE) = names(hybrid_RMSSE_v)
+print(hybrid_crossH_RMSSE)
+```
+
+
+
+
+hybrid_model%>%forecast(testData, h = 10)%>%plot()
+  
+  
+
+arima_pred_list
+RMSSE
+hw_crossH_RMSSE = data.frame()
+
+for (h in 1:28) {
+  hw_pred_list = lapply(hw_list, forecast.beta, h = h)
+  hw_RMSSE_v = eval.RMSSE(testData, hw_pred_list, h = h, devisor = devisors)
+  hw_crossH_RMSSE = rbind(hw_crossH_RMSSE, hw_RMSSE_v)
+}
+```
+
 
 #### (f) Compare the in-sample (training) vs. out-of-sample (testing) fit of the models.
 ```{r warning = F}
@@ -168,8 +205,8 @@ print(store_ses_RMSSE_v)
 week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], ts)
 week_ses_list = lapply(week_ts_list, ses, h=4)
 week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
-week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_ses_list, h = 4, devisor = week_devisors)
-print(week_tbats_RMSSE_v)
+week_ses_RMSSE_v = eval.RMSSE(testAggWeek, week_ses_list, h = 4, devisor = week_devisors)
+print(week_ses_RMSSE_v)
 ```
 
 
@@ -437,8 +474,8 @@ print(store_esx_snap_RMSSE_v)
 week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], ts)
 week_esx_snap_list = lapply(week_ts_list, ses, h=4)
 week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
-week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_esx_snap_list, h = 4, devisor = week_devisors)
-print(week_tbats_RMSSE_v)
+week_esx_snap_RMSSE_v = eval.RMSSE(testAggWeek, week_esx_snap_list, h = 4, devisor = week_devisors)
+print(week_esx_snap_RMSSE_v)
 ```
 
 
@@ -477,8 +514,8 @@ print(store_esx_holiday_RMSSE_v)
 week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], ts)
 week_esx_holiday_list = lapply(week_ts_list, ses, h=4)
 week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
-week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_esx_holiday_list, h = 4, devisor = week_devisors)
-print(week_tbats_RMSSE_v)
+week_esx_holiday_RMSSE_v = eval.RMSSE(testAggWeek, week_esx_holiday_list, h = 4, devisor = week_devisors)
+print(week_esx_holiday_RMSSE_v)
 ```
 
 
