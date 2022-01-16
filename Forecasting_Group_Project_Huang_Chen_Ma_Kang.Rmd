@@ -58,7 +58,7 @@ print(summary(tbats_list[[5]]))
 ```
 #### (c) Obtain a sequence of 1-step ahead point forecasts over the testing subsample.
 ```{r}
-
+print(hybrid_crossH_RMSSE)
 ```
 #### (d) Assess the quality of the forecasts using relevant loss functions.
 We used RMSSE to evaluate the performance of each forecast model.
@@ -103,6 +103,7 @@ data.frame(cbind(tbats_RMSE_train_v,tbats_RMSE_test_v),row.names = name_list)
 ### the M5 guidelines.
 ```{r}
 print(naive_crossH_RMSSE)
+print(snaive_crossH_RMSSE)
 print(ses_crossH_RMSSE)
 print(esx_holiday_crossH_RMSSE)
 print(esx_snap_crossH_RMSSE)
@@ -123,6 +124,7 @@ print(summary(cat_esx_holiday_list[[1]]))
 print(summary(cat_esx_snap_list[[1]]))
 print(summary(cat_hw_list[[1]]))
 print(summary(cat_tbats_list[[1]]))
+
 ```
 
 #### (b) Compare the forecasts of the aggregates to the aggregates of the forecasts that you
@@ -140,6 +142,7 @@ print(cbind(naive_cat_RMSSE_v
 ,cat_hw_RMSSE_v
 ,cat_tbats_RMSSE_v
 ))
+
 ```
 
 
@@ -164,8 +167,6 @@ print(cbind(naive_week_RMSSE_v
 ,week_ses_RMSSE_v
 ,week_esx_holiday_RMSSE_v
 ,week_esx_snap_RMSSE_v
-,week_arima_RMSSE_v
-,week_arimax_RMSSE_v
 ,week_hw_RMSSE_v
 ,week_tbats_RMSSE_v
 ))
