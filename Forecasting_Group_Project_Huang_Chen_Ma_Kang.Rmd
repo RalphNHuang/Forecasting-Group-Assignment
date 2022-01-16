@@ -9,16 +9,15 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r:}
+```{r include=F}
 source("./R/utils.R")
 source("./R/dataUtils.R")
+load('./.RData')
 load("./RData/dataset.RData")
 load("./RData/scaled_naive.RData")
-
-library(fpp2)
-library(smooth)
-
-
+load('./RData/arima_crossH_RMSSE.RData')
+load('./RData/arimax_crossH_RMSSE.RData')
+load("./RData/tbats.RData")
 
 ```
 
@@ -61,20 +60,42 @@ We used RMSSE to evaluate the performance of each forecast model.
 
 ```
 #### (f) Compare the in-sample (training) vs. out-of-sample (testing) fit of the models.
-```{r: in/out sample fit }
+```{r: Combination benchmark #21 }
 
 ```
 #### (g) Do you find similarities in terms of forecast performance across stores or types of items?
-```{r:  }
 
-```
 
 
 ### 1.3 Consider varying the horizon, h, and obtaining forecasts for h = 1, ..., 28. Do you find different
 ### rankings of models according to the RMSSE (Root Mean Square Scaled Error) suggested in
 ### the M5 guidelines.
+```{r}
+naive_crossH_RMSSE
+```
+```{r}
+snaive_crossH_RMSSE
+```
+```{r}
+ses_crossH_RMSSE
+```
 
-
+```{r}
+esx_holiday_crossH_RMSSE
+esx_snap_crossH_RMSSE
+```
+```{r}
+arima_crossH_RMSSE
+```
+```{r}
+arimax_crossH_RMSSE
+```
+```{r}
+hw_crossH_RMSSE
+```
+```{r}
+tbats_crossH_RMSSE
+```
 
 ### 1.4 Now, in this question only, aggregate the data at the store or type of item level.
 #### (a) Produce forecasts for these aggregates using the previous methods and assess them.
