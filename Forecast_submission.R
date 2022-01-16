@@ -10,6 +10,7 @@ library(zoo)
 library(forecast)
 library(dplyr)
 library(tseries)
+library(forecastHybrid)
 
 source("./R/utils.R")
 source("./R/dataUtils.R")
@@ -306,6 +307,24 @@ tbats_RMSSE_v = eval.RMSSE(testData, tbats_pred_list, devisor = devisors)
 ### calcualte the MES for both train set and test set
 tbats_RMSE_train_v = eval.RMSE(trainData, tbats_pred_list, mode = "train")
 tbats_RMSE_test_v = eval.RMSE(testData, tbats_pred_list, mode = "test")
+
+
+####1.2.e Compare the above with combinations of the forecasting techniques 
+####(using simple averages across methods, such as Combination benchmark #21 in the M5 guidelines).
+ts_list = lapply(trainData[,2:ncol(rawData)], ts)
+hybrid_list = lapply(ts_list, hybridModel,models='ae',weights='equal')
+devisors = unlist(lapply(trainData[,2:ncol(trainData)], cal.devisor))
+
+hybrid_crossH_RMSSE = data.frame()
+for (h in 1:20) {
+  hybrid_pred_list = lapply(hybrid_list, forecast.beta, h = h)
+  hybrid_RMSSE_v = eval.RMSSE(testData, hybrid_pred_list, h = h, devisor = devisors)
+  hybrid_crossH_RMSSE = rbind(hybrid_crossH_RMSSE, hybrid_RMSSE_v)
+}
+
+names(hybrid_crossH_RMSSE) = names(hybrid_RMSSE_v)
+print(hybrid_crossH_RMSSE)
+
 
 
 ##1.3  RMSSE h=1,...,28
