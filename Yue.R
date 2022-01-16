@@ -1,0 +1,589 @@
+---
+title: "Forecasting & Predictive Group Assignment"
+author: "Kai KANG, Jiaqian MA, Yinzhe HUANG, Yue CHEN"
+date: "2022/1/12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+##### Source function
+```{r}
+#重要！导入所有函数，需要tidyverse包
+source("./R/utils.R")
+source("./R/dataUtils.R")
+load("./RData/dataset.RData")
+
+
+### Dataset splition
+rawData = read_csv("./dat/Projectdata.csv")
+rawData[,2:ncol(rawData)] = apply(rawData[,2:ncol(rawData)], 2, scale)
+trainData = rawData[c(1:(nrow(rawData)-28)),]
+testData = rawData[c((nrow(rawData)-27):nrow(rawData)),]
+
+### Aggregation
+
+# by categories
+trainAggCat = agg_by_cat(trainData)
+testAggCat = agg_by_cat(testData)
+
+
+# by week
+trainAggWeek = agg_by_week(trainData)
+testAggWeek = agg_by_week(testData)
+
+
+# by store
+trainAggStore = agg_by_store(trainData)
+testAggStore = agg_by_store(testData)
+
+save(rawData, testAggCat, testAggStore, testAggWeek, testData,
+     trainAggCat, trainAggStore, trainAggWeek, trainData,
+     file = "./RData/dataset.RData")
+```
+
+##### Dataset splition
+```{r}
+trainData = rawData[c(1:(nrow(rawData)-28)),]
+testData = rawData[c((nrow(rawData)-27):nrow(rawData)),]
+```
+
+### Aggregation
+```{r}
+# by categories
+trainAggCat = agg_by_cat(trainData)
+testAggCat = agg_by_cat(testData)
+
+# by store
+trainAggStore = agg_by_store(trainData)
+testAggStore = agg_by_store(testData)
+
+# by week
+trainAggWeek = agg_by_week(trainData)
+testAggWeek = agg_by_week(testData)
+```
+
+
+
+
+
+
+
+
+
+
+### 1.2 We now want to assess the set of benchmark in the M5 guidelines. For several sample splits of your choice,
+
+
+
+
+
+
+
+
+########################################### ES #############################################
+
+#### (a) Fit Statistical benchmarks 1 (Naive), 2 (sNaive), 3 (ES), 4 (MA), 13 (ESX), as well
+#### as SARIMA, SARIMAX (using X as in ESX) and Holt-Winters up to the end of the
+#### training subsample.
+
+### 1.3 Consider varying the horizon, h, and obtaining forecasts for h = 1, ..., 28. Do you find different
+### rankings of models according to the RMSSE (Root Mean Square Scaled Error) suggested in
+### the M5 guidelines.
+
+```{r warning=False} 
+ts_list = lapply(trainData[,2:ncol(rawData)], ts)
+
+devisors = unlist(lapply(trainData[,2:ncol(trainData)], cal.devisor))
+
+ses_crossH_RMSSE = data.frame()
+for (h in 1:28) {
+  ses_pred_list = lapply(ts_list, ses, h=h)
+  ses_RMSSE_v = eval.RMSSE(testData, ses_pred_list, h = h, devisor = devisors)
+  ses_crossH_RMSSE = rbind(ses_crossH_RMSSE, ses_RMSSE_v)
+}
+
+names(ses_crossH_RMSSE) = names(ses_RMSSE_v)
+print(ses_crossH_RMSSE)
+```
+#### (c) Obtain a sequence of 1-step ahead point forecasts over the testing subsample.
+```
+print(lapply(ts_list, ses, h=1))
+```
+
+#### (d) Assess the quality of the forecasts using relevant loss functions.
+
+#### (e) Compare the above with combinations of the forecasting techniques (using simple averages across methods, such as Combination benchmark #21 in the M5 guidelines).
+
+#### (f) Compare the in-sample (training) vs. out-of-sample (testing) fit of the models.
+```{r warning = F}
+ses_RMSE_train_v = eval.RMSE(trainData, ses_pred_list, mode = "train")
+ses_RMSE_test_v = eval.RMSE(testData, ses_pred_list, mode = "test")
+```
+
+#### (g) Do you find similarities in terms of forecast performance across stores or types of items?
+
+
+
+
+
+
+
+
+### 1.4 Now, in this question only, aggregate the data at the store or type of item level.
+#### (a) Produce forecasts for these aggregates using the previous methods and assess them.
+#### (b) Compare the forecasts of the aggregates to the aggregates of the forecasts that you
+#### had obtained in previous questions, can you find systematic pattern in terms of relative
+#### forecasting performance?
+
+### 1.4 aggregate by item
+```{r warning=False}
+cat_ts_list = lapply(trainAggCat[,2:ncol(trainAggCat)], ts)
+cat_ses_list = lapply(cat_ts_list, ses, h=4)
+cat_devisors = unlist(lapply(trainAggCat[,2:ncol(trainAggCat)], cal.devisor))
+cat_ses_RMSSE_v = eval.RMSSE(testAggCat, cat_ses_list, h=4, devisor = cat_devisors)
+print(cat_ses_RMSSE_v)
+```
+### 1.4 aggregate by store
+```{r warning=False}
+store_ts_list = lapply(trainAggStore[,2:ncol(trainAggStore)], ts)
+store_ses_list = lapply(store_ts_list, ses, h=4)
+store_devisors = unlist(lapply(trainAggStore[,2:ncol(trainAggStore)], cal.devisor))
+store_ses_RMSSE_v = eval.RMSSE(testAggStore, store_ses_list, h=4, devisor = store_devisors)
+print(store_ses_RMSSE_v)
+```
+
+
+### 1.5 Now, in this question only, aggregate the data at the weekly frequency,
+#### (a) produce forecasts for the weekly aggregates using the previous methods and assess them
+#### (b) Compare the forecasts of the weekly aggregates vs. the weekly aggregates of the daily
+#### forecasts, can you find systematic pattern?
+
+### 1.5 aggregate by week
+```{r warning=False}
+week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], ts)
+week_ses_list = lapply(week_ts_list, ses, h=4)
+week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
+week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_ses_list, h = 4, devisor = week_devisors)
+print(week_tbats_RMSSE_v)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################################### HoltWinters #############################################
+
+#### (a) Fit Statistical benchmarks 1 (Naive), 2 (sNaive), 3 (ES), 4 (MA), 13 (ESX), as well
+#### as SARIMA, SARIMAX (using X as in ESX) and Holt-Winters up to the end of the
+#### training subsample.
+
+### 1.3 Consider varying the horizon, h, and obtaining forecasts for h = 1, ..., 28. Do you find different
+### rankings of models according to the RMSSE (Root Mean Square Scaled Error) suggested in
+### the M5 guidelines.
+
+```{r warning=False} 
+ts_list = lapply(trainData[,2:ncol(rawData)], ts)
+hw_list = lapply(ts_list, ets)
+devisors = unlist(lapply(trainData[,2:ncol(trainData)], cal.devisor))
+
+hw_crossH_RMSSE = data.frame()
+for (h in 1:28) {
+  hw_pred_list = lapply(hw_list, forecast.beta, h = h)
+  hw_RMSSE_v = eval.RMSSE(testData, hw_pred_list, h = h, devisor = devisors)
+  hw_crossH_RMSSE = rbind(hw_crossH_RMSSE, hw_RMSSE_v)
+}
+
+names(hw_crossH_RMSSE) = names(hw_RMSSE_v)
+print(hw_crossH_RMSSE)
+```
+#### (c) Obtain a sequence of 1-step ahead point forecasts over the testing subsample.
+```{r}
+step_1_hw_pred_seq = c()
+for (i in 1:28) {
+  train_data_step_1 = rawData[c(1:(nrow(rawData)-i)),]
+  test_data_step_1 = rawData[c((nrow(rawData)-i+1):nrow(rawData)),]
+  train_step_1_ts = ts(train_data_step_1$Hobbies_CA_1)
+  hw_step_1 = ets(train_step_1_ts)
+  hw_pred_step_1 = forecast.beta(hw_list,h=1)
+  step_1_hw_pred_seq[i] = hw_pred_step_1
+}
+```
+
+#### (d) Assess the quality of the forecasts using relevant loss functions.
+
+#### (e) Compare the above with combinations of the forecasting techniques (using simple averages across methods, such as Combination benchmark #21 in the M5 guidelines).
+
+#### (f) Compare the in-sample (training) vs. out-of-sample (testing) fit of the models.
+```{r warning = F}
+hw_RMSE_train_v = eval.RMSE(trainData, hw_pred_list, mode = "train")
+hw_RMSE_test_v = eval.RMSE(testData, hw_pred_list, mode = "test")
+```
+#### (g) Do you find similarities in terms of forecast performance across stores or types of items?
+
+
+
+
+
+
+
+### 1.4 Now, in this question only, aggregate the data at the store or type of item level.
+#### (a) Produce forecasts for these aggregates using the previous methods and assess them.
+#### (b) Compare the forecasts of the aggregates to the aggregates of the forecasts that you
+#### had obtained in previous questions, can you find systematic pattern in terms of relative
+#### forecasting performance?
+
+### 1.4 aggregate by item
+```{r warning=False} 
+cat_ts_list = lapply(trainAggCat[,2:ncol(trainAggCat)], msts.beta)
+cat_hw_list = lapply(cat_ts_list, ets)
+cat_hw_pred_list = lapply(cat_ts_list, forecast.beta)
+cat_devisors = unlist(lapply(trainAggCat[,2:ncol(trainAggCat)], cal.devisor))
+cat_hw_RMSSE_v = eval.RMSSE(testAggCat, cat_hw_pred_list, devisor = cat_devisors)
+print(cat_hw_RMSSE_v)
+```
+### 1.4 aggregate by store
+```{r warning=False} 
+store_ts_list = lapply(trainAggStore[,2:ncol(trainAggStore)], msts.beta)
+store_hw_list = lapply(store_ts_list, ets)
+store_hw_pred_list = lapply(store_ts_list, forecast.beta)
+store_devisors = unlist(lapply(trainAggStore[,2:ncol(trainAggStore)], cal.devisor))
+store_hw_RMSSE_v = eval.RMSSE(testAggStore, store_hw_pred_list, devisor = store_devisors)
+print(store_hw_RMSSE_v)
+```
+
+### 1.5 Now, in this question only, aggregate the data at the weekly frequency,
+#### (a) produce forecasts for the weekly aggregates using the previous methods and assess them
+#### (b) Compare the forecasts of the weekly aggregates vs. the weekly aggregates of the daily
+#### forecasts, can you find systematic pattern?
+
+### 1.5 aggregate by week
+```{r warning=False} 
+week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], msts.beta)
+week_hw_list = lapply(week_ts_list, ets)
+week_hw_pred_list = lapply(week_ts_list, forecast.beta, h = 4)
+week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
+week_hw_RMSSE_v = eval.RMSSE(testAggWeek, week_hw_pred_list, h = 4, devisor = week_devisors)
+print(week_hw_RMSSE_v)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+########################################### ESX #############################################
+
+#### (a) Fit Statistical benchmarks 1 (Naive), 2 (sNaive), 3 (ES), 4 (MA), 13 (ESX), as well
+#### as SARIMA, SARIMAX (using X as in ESX) and Holt-Winters up to the end of the
+#### training subsample.
+
+### 1.3 Consider varying the horizon, h, and obtaining forecasts for h = 1, ..., 28. Do you find different
+### rankings of models according to the RMSSE (Root Mean Square Scaled Error) suggested in
+### the M5 guidelines.
+
+##### ESX - Exponential Smoothing with eXplanatory variables
+##### read calendar
+```{r}
+calendar = read.csv("./dat/calendar.csv")
+
+x_var <- calendar
+x_var$holiday <- 0
+x_var[is.na(x_var$event_type_1)==F,]$holiday <- 1
+x_var <- x_var[,c("snap_CA","holiday")]
+x_var <- x_var[c(1:(nrow(x_var)-28)),]
+
+x_var_train <- x_var[c(1:(nrow(x_var)-28)),]
+x_var_train <- as.matrix(x_var_train)
+x_var_test <- x_var[c((nrow(x_var)-27):nrow(x_var)),]
+x_var_test <- as.matrix(x_var_test)
+```
+
+##### use snap_CA to do ESX
+```{r warning=False} 
+ts_list = lapply(trainData[,2:ncol(rawData)], ts)
+
+devisors = unlist(lapply(trainData[,2:ncol(trainData)], cal.devisor))
+
+esx_snap_crossH_RMSSE = data.frame()
+for (h in 1:28) {
+  esx_snap_pred_list = lapply(ts_list, ses, h=h, xreg =x_var_train$snap_CA)
+  esx_snap_RMSSE_v = eval.RMSSE(testData, esx_snap_pred_list, h = h, devisor = devisors)
+  esx_snap_crossH_RMSSE = rbind(esx_snap_crossH_RMSSE, esx_snap_RMSSE_v)
+}
+
+names(esx_snap_crossH_RMSSE) = names(esx_snap_RMSSE_v)
+print(esx_snap_crossH_RMSSE)
+# snap
+```
+
+##### use holiday to do ESX
+```{r warning=False} 
+ts_list = lapply(trainData[,2:ncol(rawData)], ts)
+
+devisors = unlist(lapply(trainData[,2:ncol(trainData)], cal.devisor))
+
+esx_holiday_crossH_RMSSE = data.frame()
+for (h in 1:28) {
+  esx_holiday_pred_list = lapply(ts_list, ses, h=h, xreg =x_var_train$holidy)
+  esx_holiday_RMSSE_v = eval.RMSSE(testData, esx_holiday_pred_list, h = h, devisor = devisors)
+  esx_holiday_crossH_RMSSE = rbind(esx_holiday_crossH_RMSSE, esx_holiday_RMSSE_v)
+}
+
+names(esx_holiday_crossH_RMSSE) = names(esx_holiday_RMSSE_v)
+print(esx_holiday_crossH_RMSSE)
+# holiday
+```
+
+#### (c) Obtain a sequence of 1-step ahead point forecasts over the testing subsample.
+```{r}
+print(lapply(ts_list, ses, h=h, xreg =x_var_train$snap_CA))
+print(lapply(ts_list, ses, h=h, xreg =x_var_train$holidy))
+```
+
+#### (d) Assess the quality of the forecasts using relevant loss functions.
+
+#### (e) Compare the above with combinations of the forecasting techniques (using simple averages across methods, such as Combination benchmark #21 in the M5 guidelines).
+
+#### (f) Compare the in-sample (training) vs. out-of-sample (testing) fit of the models.
+```{r warning = F}
+esx_snap_RMSE_train_v = eval.RMSE(trainData, esx_snap_pred_list, mode = "train")
+esx_snap_RMSE_test_v = eval.RMSE(testData, esx_snap_pred_list, mode = "test")
+esx_holiday_RMSE_train_v = eval.RMSE(trainData, esx_holiday_pred_list, mode = "train")
+esx_holiday_RMSE_test_v = eval.RMSE(testData, esx_holiday_pred_list, mode = "test")
+```
+#### (g) Do you find similarities in terms of forecast performance across stores or types of items?
+
+
+
+
+
+
+
+### 1.4 Now, in this question only, aggregate the data at the store or type of item level.
+#### (a) Produce forecasts for these aggregates using the previous methods and assess them.
+#### (b) Compare the forecasts of the aggregates to the aggregates of the forecasts that you
+#### had obtained in previous questions, can you find systematic pattern in terms of relative
+#### forecasting performance?
+
+### 1.4 aggregate by item
+```{r warning=False}
+cat_ts_list = lapply(trainAggCat[,2:ncol(trainAggCat)], ts)
+cat_esx_snap_list = lapply(cat_ts_list, ses, h=4)
+cat_devisors = unlist(lapply(trainAggCat[,2:ncol(trainAggCat)], cal.devisor))
+cat_esx_snap_RMSSE_v = eval.RMSSE(testAggCat, cat_esx_snap_list, h=4, devisor = cat_devisors)
+print(cat_esx_snap_RMSSE_v)
+```
+### 1.4 aggregate by store
+```{r warning=False}
+store_ts_list = lapply(trainAggStore[,2:ncol(trainAggStore)], ts)
+store_esx_snap_list = lapply(store_ts_list, ses, h=4)
+store_devisors = unlist(lapply(trainAggStore[,2:ncol(trainAggStore)], cal.devisor))
+store_esx_snap_RMSSE_v = eval.RMSSE(testAggStore, store_esx_snap_list, h=4, devisor = store_devisors)
+print(store_esx_snap_RMSSE_v)
+```
+
+### 1.5 Now, in this question only, aggregate the data at the weekly frequency,
+#### (a) produce forecasts for the weekly aggregates using the previous methods and assess them
+#### (b) Compare the forecasts of the weekly aggregates vs. the weekly aggregates of the daily
+#### forecasts, can you find systematic pattern?
+
+### 1.5 aggregate by week
+```{r warning=False}
+week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], ts)
+week_esx_snap_list = lapply(week_ts_list, ses, h=4)
+week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
+week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_esx_snap_list, h = 4, devisor = week_devisors)
+print(week_tbats_RMSSE_v)
+```
+
+
+
+
+### 1.4 Now, in this question only, aggregate the data at the store or type of item level.
+#### (a) Produce forecasts for these aggregates using the previous methods and assess them.
+#### (b) Compare the forecasts of the aggregates to the aggregates of the forecasts that you
+#### had obtained in previous questions, can you find systematic pattern in terms of relative
+#### forecasting performance?
+
+### 1.4 aggregate by item
+```{r warning=False}
+cat_ts_list = lapply(trainAggCat[,2:ncol(trainAggCat)], ts)
+cat_esx_holiday_list = lapply(cat_ts_list, ses, h=4)
+cat_devisors = unlist(lapply(trainAggCat[,2:ncol(trainAggCat)], cal.devisor))
+cat_esx_holiday_RMSSE_v = eval.RMSSE(testAggCat, cat_esx_holiday_list, h=4, devisor = cat_devisors)
+print(cat_esx_holiday_RMSSE_v)
+```
+### 1.4 aggregate by store
+```{r warning=False}
+store_ts_list = lapply(trainAggStore[,2:ncol(trainAggStore)], ts)
+store_esx_holiday_list = lapply(store_ts_list, ses, h=4)
+store_devisors = unlist(lapply(trainAggStore[,2:ncol(trainAggStore)], cal.devisor))
+store_esx_holiday_RMSSE_v = eval.RMSSE(testAggStore, store_esx_holiday_list, h=4, devisor = store_devisors)
+print(store_esx_holiday_RMSSE_v)
+```
+
+### 1.5 Now, in this question only, aggregate the data at the weekly frequency,
+#### (a) produce forecasts for the weekly aggregates using the previous methods and assess them
+#### (b) Compare the forecasts of the weekly aggregates vs. the weekly aggregates of the daily
+#### forecasts, can you find systematic pattern?
+
+### 1.5 aggregate by week
+```{r warning=False}
+week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], ts)
+week_esx_holiday_list = lapply(week_ts_list, ses, h=4)
+week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
+week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_esx_holiday_list, h = 4, devisor = week_devisors)
+print(week_tbats_RMSSE_v)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+forecast(prison.gts, method="bu", fmethod="arima")
+
+install.packages('hts')
+library(hts)
+gts(unlist(ts_list[1])),
+gnames = c("State", "Gender", "Legal","State*Gender", "State*Legal","Gender*Legal")
+
+
+
+
+hts(ts_list[1], characters = c(3, 6))
+
+lapply(ts_list, hts, characters = c(3, 6))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+rawData[,2:19]
+mts_ts <- ts(trainData[,2:19])
+hts_ts <- hts(mts_ts)
+
+# bts<-window(bts,start=c(2008,2))
+# tourism.hts <- hts(bts, nodes=list(2,c(3,6)))
+
+
+nodes=list(4,c(5, 4, 5, 2)))
+
+
+
+
+

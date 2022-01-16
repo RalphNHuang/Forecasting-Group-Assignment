@@ -13,11 +13,16 @@ knitr::opts_chunk$set(echo = TRUE)
 source("./R/utils.R")
 source("./R/dataUtils.R")
 load('./.RData')
-load("./RData/dataset.RData")
-load("./RData/scaled_naive.RData")
-load('./RData/arima_crossH_RMSSE.RData')
-load('./RData/arimax_crossH_RMSSE.RData')
-load("./RData/tbats.RData")
+
+for (i in dir("./RData/")){
+  path = paste("./RData/", i, sep = "")
+  load(path)
+}
+
+for (i in dir("./1.2.f/")){
+  path = paste("./1.2.f/", i, sep = "")
+  load(path)
+}
 
 ```
 
@@ -38,30 +43,61 @@ Based on the result of ADF test on each column, expect for p-value of `Foods_1_C
 #### (a) Fit Statistical benchmarks 1 (Naive), 2 (sNaive), 3 (ES), 4 (MA), 13 (ESX), as well
 #### as SARIMA, SARIMAX (using X as in ESX) and Holt-Winters up to the end of the
 #### training subsample.
-```{r: ADF test}
+```{r}
+# you can choose to summary different model(by change model_list) with different product(by change [1])
+naive_pred_list
+snaive_pred_list
+ses_pred_list
+ma_pred_list
+esx_holiday_pred_list
+esx_snap_pred_list
+arima_pred_list
+arimax_pred_list_snap
+hw_pred_list
 
 ```
 #### (b) Consider also a state-space model where the latent state variable follows a random walk.
 #### Have a look as well at the TBATS package in R.
-```{r: ADF test}
+```{r}
 
 ```
 #### (c) Obtain a sequence of 1-step ahead point forecasts over the testing subsample.
-```{r: ADF test}
+```{r}
 
 ```
 #### (d) Assess the quality of the forecasts using relevant loss functions.
 We used RMSSE to evaluate the performance of each forecast model.
-```{r: RMSSE}
-
+```{r}
+cbind(naive_RMSSE_v
+,snaive_RMSSE_v
+,ses_RMSSE_v
+,ma_RMSSE_v
+,esx_holiday_RMSSE_v
+,esx_snap_RMSSE_v
+,arima_RMSSE_v
+,arimax_snap_RMSSE_v
+,hw_RMSSE_v
+,tbats_RMSSE_v
+)
 ```
 #### (e) Compare the above with combinations of the forecasting techniques (using simple averages across methods, such as Combination benchmark #21 in the M5 guidelines)
-```{r: Combination benchmark #21 }
+```{r}
 
 ```
 #### (f) Compare the in-sample (training) vs. out-of-sample (testing) fit of the models.
-```{r: Combination benchmark #21 }
+```{r}
+name_list = names(trainData[,2:19])
 
+data.frame(cbind(naive_RMSE_train_v,naive_RMSE_test_v),row.names = name_list)
+data.frame(cbind(snaive_RMSE_train_v,snaive_RMSE_test_v),row.names = name_list)
+data.frame(cbind(ses_RMSE_train_v,ses_RMSE_test_v),row.names = name_list)
+data.frame(cbind(ma_RMSE_train_v,ma_RMSE_test_v),row.names = name_list)
+data.frame(cbind(esx_holiday_RMSE_train_v,esx_holiday_RMSE_test_v),row.names = name_list)
+data.frame(cbind(esx_snap_RMSE_train_v,esx_snap_RMSE_test_v),row.names = name_list)
+data.frame(cbind(arima_RMSE_train_v,arima_RMSE_test_v),row.names = name_list)
+data.frame(cbind(arimax_RMSE_train_v,arimax_RMSE_test_v),row.names = name_list)
+data.frame(cbind(hw_RMSE_train_v,hw_RMSE_test_v),row.names = name_list)
+data.frame(cbind(tbats_RMSE_train_v,tbats_RMSE_test_v),row.names = name_list)
 ```
 #### (g) Do you find similarities in terms of forecast performance across stores or types of items?
 
