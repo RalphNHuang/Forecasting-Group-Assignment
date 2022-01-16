@@ -168,8 +168,8 @@ print(store_ses_RMSSE_v)
 week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], ts)
 week_ses_list = lapply(week_ts_list, ses, h=4)
 week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
-week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_ses_list, h = 4, devisor = week_devisors)
-print(week_tbats_RMSSE_v)
+week_ses_RMSSE_v = eval.RMSSE(testAggWeek, week_ses_list, h = 4, devisor = week_devisors)
+print(week_ses_RMSSE_v)
 ```
 
 
@@ -437,8 +437,8 @@ print(store_esx_snap_RMSSE_v)
 week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], ts)
 week_esx_snap_list = lapply(week_ts_list, ses, h=4)
 week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
-week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_esx_snap_list, h = 4, devisor = week_devisors)
-print(week_tbats_RMSSE_v)
+week_esx_snap_RMSSE_v = eval.RMSSE(testAggWeek, week_esx_snap_list, h = 4, devisor = week_devisors)
+print(week_esx_snap_RMSSE_v)
 ```
 
 
@@ -477,8 +477,8 @@ print(store_esx_holiday_RMSSE_v)
 week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], ts)
 week_esx_holiday_list = lapply(week_ts_list, ses, h=4)
 week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
-week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_esx_holiday_list, h = 4, devisor = week_devisors)
-print(week_tbats_RMSSE_v)
+week_esx_holiday_RMSSE_v = eval.RMSSE(testAggWeek, week_esx_holiday_list, h = 4, devisor = week_devisors)
+print(week_esx_holiday_RMSSE_v)
 ```
 
 
