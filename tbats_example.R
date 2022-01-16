@@ -4,7 +4,8 @@ source("./R/dataUtils.R")
 
 
 ### Dataset splition
-#rawData = read_csv("./dat/Projectdata.csv")
+rawData = read_csv("./dat/Projectdata.csv")
+rawData[,2:ncol(rawData)] = apply(rawData[,2:ncol(rawData)], 2, scale)
 trainData = rawData[c(1:(nrow(rawData)-28)),]
 testData = rawData[c((nrow(rawData)-27):nrow(rawData)),]
 
@@ -23,6 +24,10 @@ testAggWeek = agg_by_week(testData)
 # by store
 trainAggStore = agg_by_store(trainData)
 testAggStore = agg_by_store(testData)
+
+save(rawData, testAggCat, testAggStore, testAggWeek, testData,
+     trainAggCat, trainAggStore, trainAggWeek, trainData,
+     file = "./RData/dataset.RData")
 
 ### experiment with one column
 
@@ -66,13 +71,20 @@ tbats_list = lapply(ts_list, tbats)
 
 
 ### same as the predicting process
-pred_list = lapply(tbats_list, forecast.beta)
+tbats_pred_list = lapply(tbats_list, forecast.beta)
 
 ### calculate the devisors for RMSSE
 devisors = unlist(lapply(trainData[,2:ncol(trainData)], cal.devisor))
 
-### calculate the RMSSE for all columns
-tbats_RMSSE_v = eval.RMSSE(testData, pred_list, devisor = devisors)
+### calculate the RMSSE for all columns (h =28)
+tbats_RMSSE_v = eval.RMSSE(testData, tbats_pred_list, devisor = devisors)
+
+### calcualte the MES for both train set and test set
+
+tbats_RMSE_train_v = eval.RMSE(trainData, tbats_pred_list, mode = "train")
+tbats_RMSE_test_v = eval.RMSE(testData, tbats_pred_list, mode = "test")
+
+
 
 
 # 1.3 evaluate different h
@@ -89,22 +101,31 @@ names(tbats_crossH_RMSSE) = names(tbats_RMSSE_v)
 
 cat_ts_list = lapply(trainAggCat[,2:ncol(trainAggCat)], msts.beta)
 cat_tbats_list = lapply(cat_ts_list, tbats)
-cat_pred_list = lapply(cat_ts_list, forecast.beta)
+cat_tbats_pred_list = lapply(cat_tbats_list, forecast.beta)
 cat_devisors = unlist(lapply(trainAggCat[,2:ncol(trainAggCat)], cal.devisor))
-cat_tbats_RMSSE_v = eval.RMSSE(testAggCat, cat_pred_list, devisor = cat_devisors)
+cat_tbats_RMSSE_v = eval.RMSSE(testAggCat, cat_tbats_pred_list, devisor = cat_devisors)
 
 # 1.4 aggregate by store
 
 store_ts_list = lapply(trainAggStore[,2:ncol(trainAggStore)], msts.beta)
 store_tbats_list = lapply(store_ts_list, tbats)
-store_pred_list = lapply(store_ts_list, forecast.beta)
+store_tbats_pred_list = lapply(store_tbats_list, forecast.beta)
 store_devisors = unlist(lapply(trainAggStore[,2:ncol(trainAggStore)], cal.devisor))
-store_tbats_RMSSE_v = eval.RMSSE(testAggStore, store_pred_list, devisor = store_devisors)
+store_tbats_RMSSE_v = eval.RMSSE(testAggStore, store_tbats_pred_list, devisor = store_devisors)
 
 # 1.5 aggregate by week
 
 week_ts_list = lapply(trainAggWeek[,2:ncol(trainAggWeek)], msts.beta)
 week_tbats_list = lapply(week_ts_list, tbats)
-week_pred_list = lapply(week_ts_list, forecast.beta, h = 4)
+week_tbats_pred_list = lapply(week_tbats_list, forecast.beta, h = 4)
 week_devisors = unlist(lapply(trainAggWeek[,2:ncol(trainAggWeek)], cal.devisor))
-week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_pred_list, h = 4, devisor = week_devisors)
+week_tbats_RMSSE_v = eval.RMSSE(testAggWeek, week_tbats_pred_list, 
+                                h = 4, devisor = week_devisors)
+
+save(ts_list, tbats_list, tbats_pred_list, 
+     tbats_RMSSE_v, tbats_RMSE_train_v, tbats_RMSE_test_v,
+     tbats_crossH_RMSSE, 
+     cat_ts_list, cat_tbats_list, cat_tbats_pred_list, cat_tbats_RMSSE_v,
+     store_ts_list, store_tbats_list, store_tbats_pred_list, store_tbats_RMSSE_v, 
+     week_ts_list, week_tbats_list, week_tbats_pred_list, week_tbats_RMSSE_v,
+     file = "./RData/tbats.RData")

@@ -32,7 +32,7 @@ cal.devisor = function(ts_vector){
 ## devisor: RMSSE的分母，由cal.devisor()计算得到
 cal.RMSSE = function(pred, origin, devisor){
   if(length(pred) != length(origin)){
-    cat("lengthError: please keep the length of pred and the length of origin consistent")
+    cat("lengthError: please keep the length of pred and the length of origin consistent\n")
   }
   else{
     output = sqrt(sum((pred - origin)^2)/(devisor*length(pred)))
@@ -56,7 +56,7 @@ cal.RMSSE = function(pred, origin, devisor){
 eval.RMSSE = function(testData, pred_list, h = 28, devisors){
   testData = testData[1:h,2:ncol(testData)]
   if(names(testData)!=names(pred_list))
-    cat("Please rearrange the pred_list")
+    cat("Please rearrange the pred_list\n")
   else{
     output = numeric()
     for (i in 1:length(pred_list)) {
@@ -69,3 +69,42 @@ eval.RMSSE = function(testData, pred_list, h = 28, devisors){
 }
 
 
+# function to calculate RMSE
+## 输入：
+## pred：预测值
+## origin：实际值
+cal.RMSE = function(pred, origin){
+  rmse = sqrt(mean((pred-origin)^2, na.rm = T))
+  return(rmse)
+}
+
+
+# function to calculate MSE for all columns
+
+eval.RMSE = function(testData, pred_list, mode = "train"){
+  testData = testData[,2:ncol(testData)]
+  if(names(testData)!=names(pred_list))
+    cat("Please rearrange the pred_list\n")
+  else{
+    if(mode=="train"){
+      output = numeric()
+      for (i in 1:length(pred_list)) {
+        pred = pred_list[[i]][["fitted"]]
+        origin = pull(testData, i)
+        output = c(output, cal.RMSE(pred, origin))
+      }
+      return(output)
+    }
+    else if(mode=="test"){
+      output = numeric()
+      for (i in 1:length(pred_list)) {
+        pred = pred_list[[i]][["mean"]]
+        origin = pull(testData, i)
+        output = c(output, cal.RMSE(pred, origin))
+      }
+      return(output)
+    }
+    else
+      cat("please check the mode\n")
+  }
+}
