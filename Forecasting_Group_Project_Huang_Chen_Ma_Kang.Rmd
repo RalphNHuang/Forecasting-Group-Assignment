@@ -26,18 +26,137 @@ for (i in dir("./1.2.f/")){
 
 ```
 
+Scale raw data before calculating.
+With function scale, we "scale" each element by those values by subtracting the mean and dividing by the standard deviation. In this way, time series are more stable.
+
 ## 1 Assessing the data and univariate benchmarks
 ### 1.1 Are these six variables stationary,
 #### (a) using a simple method, e.g. looking at the time series plots and at the ACF/PACF?
-```{r: ACF&PACF}
-
+##### ACF & PACF of Hoobies category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Hobbies_CA_1)
+pacf(rawData$Hobbies_CA_1)
+acf(rawData$Hobbies_CA_2)
+pacf(rawData$Hobbies_CA_2)
+acf(rawData$Hobbies_CA_3)
+pacf(rawData$Hobbies_CA_3)
 ```
+
+##### ACF & PACF of Household_1 category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Household_1_CA_1)
+pacf(rawData$Household_1_CA_1)
+acf(rawData$Household_1_CA_2)
+pacf(rawData$Household_1_CA_2)
+acf(rawData$Household_1_CA_3)
+pacf(rawData$Household_1_CA_3)
+```
+
+##### ACF & PACF of Household_2 category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Household_2_CA_1)
+pacf(rawData$Household_2_CA_1)
+acf(rawData$Household_2_CA_2)
+pacf(rawData$Household_2_CA_2)
+acf(rawData$Household_2_CA_3)
+pacf(rawData$Household_2_CA_3)
+```
+
+##### ACF & PACF of Foods_1 category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Foods_1_CA_1)
+pacf(rawData$Foods_1_CA_1)
+acf(rawData$Foods_1_CA_2)
+pacf(rawData$Foods_1_CA_2)
+acf(rawData$Foods_1_CA_3)
+pacf(rawData$Foods_1_CA_3)
+```
+
+##### ACF & PACF of Food_2 category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Foods_2_CA_1)
+pacf(rawData$Foods_2_CA_1)
+acf(rawData$Foods_2_CA_2)
+pacf(rawData$Foods_2_CA_2)
+acf(rawData$Foods_2_CA_3)
+pacf(rawData$Foods_2_CA_3)
+```
+
+##### ACF & PACF of Foods_3 category
+```{r}
+par(mfrow=c(3,2))
+acf(rawData$Foods_3_CA_1)
+pacf(rawData$Foods_3_CA_1)
+acf(rawData$Foods_3_CA_2)
+pacf(rawData$Foods_3_CA_2)
+acf(rawData$Foods_3_CA_3)
+pacf(rawData$Foods_3_CA_3)
+```
+In Hobbies_CA_1,Foods_1_CA_1, Foods_2_CA_1, Hobbies_CA_2, Household_2_CA_3, Foods_1_CA_3, Foods_2_CA_3,  the ACF tails off after the first lag, PACF tails off after the 5th lag.
+In Household_1_CA_1, Foods_3_CA_1,Household_1_CA_2, Household_2_CA_2, Foods_3_CA_2, Foods_3_CA_3, the ACF tails off after the first lag, PACF tails off after the 5th lag,  with seasonality 365 days.
+In Household_2_CA_1 the ACF tails off after the first lag, PACF tails off after the 5th lag,  with seasonality 365 days and drift.
+In Foods_2_CA_2 the ACF tails off after the second lag, PACF tails off after the 5th lag with seasonality 365 days.
+In Foods_1_CA_2, the ACF is neither tail off nor cut off.
+In Hobbies_CA_3,  the ACF tails off after the second lag, PACF tails off after the 5th lag with drift.
+
+
 #### (b) performing a test?
-
-```{r: ADF test}
-
+We used ADF test on each time series.
+##### ADF Test for Hobbies category
+```{r}
+library(tseries)
+adf.test(rawData$Hobbies_CA_1)
+adf.test(rawData$Hobbies_CA_2)
+adf.test(rawData$Hobbies_CA_3)
 ```
-Based on the result of ADF test on each column, expect for p-value of `Foods_1_CA_2`, p-value of the rest column is less than 0.05, which means that the other 17 time series data is stationary. 
+
+##### ADF Test for Houshold_1 category
+```{r}
+library(tseries)
+adf.test(rawData$Household_1_CA_1)
+adf.test(rawData$Household_1_CA_2)
+adf.test(rawData$Household_1_CA_3)
+```
+
+##### ADF Test for Houshold_2 category
+```{r}
+library(tseries)
+adf.test(rawData$Household_2_CA_1)
+adf.test(rawData$Household_2_CA_2)
+adf.test(rawData$Household_2_CA_3)
+```
+
+##### ADF Test for Foods_1 category
+```{r}
+library(tseries)
+adf.test(rawData$Foods_1_CA_1)
+adf.test(rawData$Foods_1_CA_2)
+adf.test(rawData$Foods_1_CA_3)
+```
+
+##### ADF Test for Foods_2 category
+```{r}
+library(tseries)
+adf.test(rawData$Foods_2_CA_1)
+adf.test(rawData$Foods_2_CA_2)
+adf.test(rawData$Foods_2_CA_3)
+```
+
+##### ADF Test for Foods_3 category
+```{r}
+library(tseries)
+adf.test(rawData$Foods_3_CA_1)
+adf.test(rawData$Foods_3_CA_1)
+adf.test(rawData$Foods_3_CA_1)
+```
+We used ADF test on each time series. Based on the result of the ADF test on each column, except for p-value of `Foods_1_CA_2`, p-value of the rest column is less than 0.05, which means that the other 17 time series data are stationary. 
+
+
 
 ### 1.2 We now want to assess the set of benchmark in the M5 guidelines. For several sample splits of your choice,
 #### (a) Fit Statistical benchmarks 1 (Naive), 2 (sNaive), 3 (ES), 4 (MA), 13 (ESX), as well
@@ -51,11 +170,13 @@ print(summary(arimax_list_snap[[3]]))
 print(summary(hw_list[[4]]))
 print(summary(tbats_list[[5]]))
 ```
+
 #### (b) Consider also a state-space model where the latent state variable follows a random walk.
 #### Have a look as well at the TBATS package in R.
 ```{r}
-
+print(summary(tbats_list[[1]]))
 ```
+
 #### (c) Obtain a sequence of 1-step ahead point forecasts over the testing subsample.
 ```{r}
 print(hybrid_crossH_RMSSE)
@@ -75,10 +196,14 @@ cbind(naive_RMSSE_v
 ,tbats_RMSSE_v
 )
 ```
+In all, the state-space model has the least RMSSE, Holt-Winters, SARIMA, SARIMAX are basically the same, which are better than ESX, MA, ES. Naive and sNaive perform the worst.
+
 #### (e) Compare the above with combinations of the forecasting techniques (using simple averages across methods, such as Combination benchmark #21 in the M5 guidelines)
 ```{r}
-
+print(hybrid_crossH_RMSSE)
 ```
+We combine the ARIMA and ES models to get the hybrid model. Compared to the previous model, it’s worse than the state-space model, but better than the rest of the models. 
+
 #### (f) Compare the in-sample (training) vs. out-of-sample (testing) fit of the models.
 ```{r}
 name_list = names(trainData[,2:19])
@@ -94,9 +219,11 @@ data.frame(cbind(arimax_RMSE_train_v,arimax_RMSE_test_v),row.names = name_list)
 data.frame(cbind(hw_RMSE_train_v,hw_RMSE_test_v),row.names = name_list)
 data.frame(cbind(tbats_RMSE_train_v,tbats_RMSE_test_v),row.names = name_list)
 ```
+In-sample (training) is more fit than out-of-sample (testing) of the Naive, ES, Holt-Winters, state space models
+sNaive, ESX, SARIMA, SARIMAX models have similar errors on In-sample (training) and out-of-sample (testing).
+
 #### (g) Do you find similarities in terms of forecast performance across stores or types of items?
-
-
+No
 
 ### 1.3 Consider varying the horizon, h, and obtaining forecasts for h = 1, ..., 28. Do you find different
 ### rankings of models according to the RMSSE (Root Mean Square Scaled Error) suggested in
@@ -113,6 +240,7 @@ print(hw_crossH_RMSSE)
 print(tbats_crossH_RMSSE)
 
 ```
+Based on RMSSE results, we can know that the order of model performance: state-space > Holt-Winters = SARIMA = SARIMAX > ESX = MA = ES = Naive
 
 ### 1.4 Now, in this question only, aggregate the data at the store or type of item level.
 #### (a) Produce forecasts for these aggregates using the previous methods and assess them.
@@ -126,6 +254,7 @@ print(summary(cat_hw_list[[1]]))
 print(summary(cat_tbats_list[[1]]))
 
 ```
+state-space > Holt-Winters = SARIMA = SARIMAX > ESX > MA = ES = Naive
 
 #### (b) Compare the forecasts of the aggregates to the aggregates of the forecasts that you
 #### had obtained in previous questions, can you find systematic pattern in terms of relative
@@ -144,6 +273,8 @@ print(cbind(naive_cat_RMSSE_v
 ))
 
 ```
+First, we calculate the arithmetic mean of RMSSE from previous forecast models, and compare them with the results from aggregated forecast models.Use the state-space model as example, values of forecasts of the aggregates are smaller than the values of aggregates of the previous forecasts.  For Hobbies, aggregates of the previous forecasts and forecasts of the aggregates are 0.6, 0.54, for foods are 0.76, 0.56, for Households are 0.63 and 0.42.
+Thus, we can infer aggregate before forecasting will result in better forecasting performance.
 
 
 ### 1.5 Now, in this question only, aggregate the data at the weekly frequency,
@@ -171,7 +302,7 @@ print(cbind(naive_week_RMSSE_v
 ,week_tbats_RMSSE_v
 ))
 ```
-
+Use the Holt Winter model as example, the weekly aggregates of the daily forecast RMSSE is 2.56 and the forecasts of the weekly aggregates RMSSE is 0.9 which is way smaller than the former. So as the MAE and ME.
 
 ### 1.6 OPTIONAL: Based on your answers to questions 4 and 5 above, see whether using lags of
 #### the aggregates can help forecasting the daily data. When using lags of temporal aggregates,
@@ -191,43 +322,3 @@ print(cbind(naive_week_RMSSE_v
 
 
 
-## 2 Multivariate Models
-
-### 2.1 Consider a VAR model for each store and obtain resulting forecasts for the testing sample
-
-
-
-### 2.2 Consider a VAR model for each type of products and obtain forecasts.
-
-
-
-### 2.3 Consider a large VAR model involving all variables.
-
-
-
-### 2.4 OPTIONAL
-
-#### (a) If you wish, you may consider dynamic factor models where you allow the possibility of
-#### one factor for each store or each type of item.
-
-#### (b) If you wish, you may use the whole dataset available on github and consider a large
-#### dynamic factor model.
-
-
-
-
-
-
-
-
-
-## 3 Machine/Deep Learning models and extension
-
-### 3.1 Now consider machine learning benchmarks, such as those in the set of benchmarks or that
-### are available on the M5 github (e.g. LSTM, using keras in R) and compare their performance
-### in terms of point/probabilistic forecasts.
-
-
-
-
-### 3.2 Can combinations of ML/DL techniques with standard techniques help?
