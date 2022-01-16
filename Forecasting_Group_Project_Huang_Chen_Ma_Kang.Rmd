@@ -58,7 +58,7 @@ print(summary(tbats_list[[5]]))
 ```
 #### (c) Obtain a sequence of 1-step ahead point forecasts over the testing subsample.
 ```{r}
-
+print(hybrid_crossH_RMSSE)
 ```
 #### (d) Assess the quality of the forecasts using relevant loss functions.
 We used RMSSE to evaluate the performance of each forecast model.
