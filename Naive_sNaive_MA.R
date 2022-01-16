@@ -7,6 +7,7 @@ library(smooth)
 #source("./R/dataUtils.R")
 load("C:/Users/69560/Desktop/forecasting_R/scaled_naive.Rdata")
 
+
 #load("C:/Users/69560/Desktop/forecasting_R/naive.Rdata")
 #load("C:/Users/69560/Desktop/forecasting_R/scaled_naive.Rdata")
 
@@ -189,3 +190,7 @@ save(naive_pred_list,naive_RMSSE_v,naive_RMSE_train_v,naive_RMSE_test_v,
      ma_cat_RMSSE_v,naive_store_RMSSE_v,snaive_store_RMSSE_v,ma_store_RMSSE_v,
      naive_week_RMSSE_v,snaive_week_RMSSE_v, ma_week_RMSSE_v, 
      file='C:/Users/69560/Desktop/forecasting_R/scaled_naive.Rdata')
+
+save(naive_list,snaive_list,ma_list,
+     ma_cat_list,ma_store_list,ma_week_list,
+     file='C:/Users/69560/Desktop/forecasting_R/scaled_ma_model_list.Rdata')
