@@ -34,17 +34,36 @@ library(smooth)
 
 ```
 Based on the result of ADF test on each column, expect for p-value of `Foods_1_CA_2`, p-value of the rest column is less than 0.05, which means that the other 17 time series data is stationary. 
-S
+
 ### 1.2 We now want to assess the set of benchmark in the M5 guidelines. For several sample splits of your choice,
 #### (a) Fit Statistical benchmarks 1 (Naive), 2 (sNaive), 3 (ES), 4 (MA), 13 (ESX), as well
 #### as SARIMA, SARIMAX (using X as in ESX) and Holt-Winters up to the end of the
 #### training subsample.
+```{r: ADF test}
+
+```
 #### (b) Consider also a state-space model where the latent state variable follows a random walk.
 #### Have a look as well at the TBATS package in R.
+```{r: ADF test}
+
+```
 #### (c) Obtain a sequence of 1-step ahead point forecasts over the testing subsample.
+```{r: ADF test}
+
+```
 #### (d) Assess the quality of the forecasts using relevant loss functions.
-#### (e) Compare the above with combinations of the forecasting techniques (using simple averages across methods, such as Combination benchmark #21 in the M5 guidelines).
+We used RMSSE to evaluate the performance of each forecast model.
+```{r: RMSSE}
+
+```
+#### (e) Compare the above with combinations of the forecasting techniques (using simple averages across methods, such as Combination benchmark #21 in the M5 guidelines)
+```{r: Combination benchmark #21 }
+
+```
 #### (f) Compare the in-sample (training) vs. out-of-sample (testing) fit of the models.
+```{r: Combination benchmark #21 }
+
+```
 #### (g) Do you find similarities in terms of forecast performance across stores or types of items?
 
 
