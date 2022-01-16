@@ -9,6 +9,19 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r:}
+source("./R/utils.R")
+source("./R/dataUtils.R")
+load("./RData/dataset.RData")
+load("./RData/scaled_naive.RData")
+
+library(fpp2)
+library(smooth)
+
+
+
+```
+
 ## 1 Assessing the data and univariate benchmarks
 ### 1.1 Are these six variables stationary,
 #### (a) using a simple method, e.g. looking at the time series plots and at the ACF/PACF?
@@ -20,7 +33,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r: ADF test}
 
 ```
-Based on the result of ADF test on each column, expect for 
+Based on the result of ADF test on each column, expect for p-value of `Foods_1_CA_2`, p-value of the rest column is less than 0.05, which means that the other 17 time series data is stationary. 
 
 
 ### 1.2 We now want to assess the set of benchmark in the M5 guidelines. For several sample splits of your choice,
